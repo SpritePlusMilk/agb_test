@@ -1,0 +1,9 @@
+.github/
+.gitignore
+.venv/
+.ruff_cache/
+.pytest_cache/
+nginx/
+.coveragerc
+*.toml
+*.sqlite3
