@@ -1,0 +1,46 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "project.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+[tool.ruff]
+exclude = [
+    '.cache/*',
+    '.venv',
+    'venv',
+    'migrations',
+    'manage.py',
+    '__init__.py',
+]
+
+line-length = 120
+indent-width = 4
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [  # https://docs.astral.sh/ruff/rules/
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "W",  # pycodestyle warnings
+    "I",  # isort
+    "Q",  # quotes
+    "TID",  # tidy imports
+    "ANN",  # annotations
+    "DJ",  # django
+    "B",  # bugbear
+    "SIM",  # simplify
+]
+ignore = ["B904", "DJ008", "DJ001", "B905"]
+#fixable = []
+preview = true
+
+[tool.ruff.format]
+quote-style = "single"
+
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = true
+combine-as-imports = true
+known-third-party = ['aiohttp', 'asgiref', 'celery', 'django', 'dotenv', 'factory', 'faker', 'markdown2', 'pytz', 'requests', 'rest_framework']

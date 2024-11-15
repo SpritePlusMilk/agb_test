@@ -13,8 +13,8 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     # Фоновая задача по обработке Xml-файла с данными о продуктах
-    'analyze-products-data': {
-        'task': 'parser.tasks.analyze_products_data',
+    'analyze-products-task': {
+        'task': 'parser.tasks.analyze_products_task',
         'schedule': crontab(hour='12', minute='0'),
     },
 }

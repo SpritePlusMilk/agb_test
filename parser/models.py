@@ -14,6 +14,9 @@ class Xml(models.Model):
             models.Index(fields=['date']),
         ]
 
+    def __str__(self) -> str:
+        return f'Xml-файл от {self.date}'
+
 
 class Product(models.Model):
     xml_file = models.ForeignKey('Xml', verbose_name='Xml-файл', related_name='products', on_delete=models.CASCADE)
@@ -30,6 +33,9 @@ class Product(models.Model):
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
 
+    def __str__(self) -> str:
+        return f'Продукт "{self.name} ({self.category}), {self.quantity} шт., {self.price} руб.'
+
 
 class AnalysisResponse(models.Model):
     text = models.TextField('Текст анализа продаж', help_text='Ответ LLM')
@@ -38,3 +44,6 @@ class AnalysisResponse(models.Model):
     class Meta:
         verbose_name = 'Анализ продаж'
         verbose_name_plural = 'Анализ продаж'
+
+    def __str__(self) -> str:
+        return f'Анализ продаж от {self.xml_file.date}'

@@ -1,4 +1,4 @@
-from os import getenv
+from os import getenv, path
 from pathlib import Path
 
 # Основные настройки Django
@@ -99,10 +99,36 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = 'static/'
 STATIC_ROOT = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "xml_data_handler": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": path.join(BASE_DIR, 'logs/xml_files.log'),
+            'backupCount': 7,
+            'when': 'midnight',
+        },
+    },
+    "loggers": {
+        "": {
+            "level": "WARNING",
+            "handlers": ["xml_data_handler"],
+        },
+    },
+}
 
 # Настройки DRF
 REST_FRAMEWORK = {
