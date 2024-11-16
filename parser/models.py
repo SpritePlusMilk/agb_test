@@ -4,8 +4,21 @@ from django.db import models
 from parser.consts import CATEGORY_CHOICES
 
 
+class Source(models.Model):
+    url = models.URLField('URL-адрес')
+    is_active = models.BooleanField('Активен', default=True)
+
+    class Meta:
+        verbose_name = 'Источник для получения xml-файла'
+        verbose_name_plural = 'Источники для получения xml-файлов'
+
+    def __str__(self) -> str:
+        return f'Источник {self.url[:20]} (активный: {self.is_active})'
+
+
 class Xml(models.Model):
     date = models.DateField('Дата', help_text='Дата получения xml с данными о продуктах', auto_now_add=True)
+    source = models.ForeignKey('Source', verbose_name='Источник', related_name='xml_files', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Xml-файл'

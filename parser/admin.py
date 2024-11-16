@@ -3,6 +3,12 @@ from django.contrib import admin
 from parser import models
 
 
+@admin.register(models.Source)
+class Source(admin.ModelAdmin):
+    list_display = ('id', 'url', 'is_active')
+    search_fields = ('id', 'url')
+
+
 @admin.register(models.Product)
 class Product(admin.ModelAdmin):
     list_display = ('id', 'name', 'category', 'quantity', 'price', 'xml_file')

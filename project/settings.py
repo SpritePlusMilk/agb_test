@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'parser.apps.ParserConfig',
@@ -108,24 +109,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    "formatters": {
-        "verbose": {
-            "format": "{asctime}: {message}",
-            "style": "{",
+    'formatters': {
+        'verbose': {
+            'format': '{asctime}: {message}',
+            'style': '{',
         },
     },
-    "handlers": {
-        "xml_data_handler": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": path.join(BASE_DIR, 'logs/xml_files.log'),
+    'handlers': {
+        'xml_data_handler': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': path.join(BASE_DIR, 'logs/xml_files.log'),
             'backupCount': 7,
             'when': 'midnight',
         },
     },
-    "loggers": {
-        "": {
-            "level": "WARNING",
-            "handlers": ["xml_data_handler"],
+    'loggers': {
+        '': {
+            'level': 'WARNING',
+            'handlers': ['xml_data_handler'],
         },
     },
 }
