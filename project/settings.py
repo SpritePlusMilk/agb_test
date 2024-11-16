@@ -124,7 +124,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        '': {
+        'xml_data_logger': {
             'level': 'WARNING',
             'handlers': ['xml_data_handler'],
         },

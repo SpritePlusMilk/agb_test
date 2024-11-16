@@ -27,7 +27,7 @@ class Xml(admin.ModelAdmin):
     inlines = (ProductInline,)
 
 
-@admin.register(models.AnalysisResponse)
-class AnalysisResponse(admin.ModelAdmin):
-    list_display = ('id', 'xml_file', 'text')
+@admin.register(models.SalesAnalysis)
+class SalesAnalysis(admin.ModelAdmin):
+    list_display = ('id', 'xml_file__date')
     search_fields = ('id', 'text')

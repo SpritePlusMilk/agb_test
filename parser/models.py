@@ -5,7 +5,7 @@ from parser.consts import CATEGORY_CHOICES
 
 
 class Source(models.Model):
-    url = models.URLField('URL-адрес')
+    url = models.URLField('URL-адрес', unique=True)
     is_active = models.BooleanField('Активен', default=True)
 
     class Meta:
@@ -17,7 +17,7 @@ class Source(models.Model):
 
 
 class Xml(models.Model):
-    date = models.DateField('Дата', help_text='Дата получения xml с данными о продуктах', auto_now_add=True)
+    date = models.DateField('Дата', help_text='Дата получения xml с данными о продуктах')
     source = models.ForeignKey('Source', verbose_name='Источник', related_name='xml_files', on_delete=models.CASCADE)
 
     class Meta:
@@ -50,13 +50,16 @@ class Product(models.Model):
         return f'Продукт "{self.name} ({self.category}), {self.quantity} шт., {self.price} руб.'
 
 
-class AnalysisResponse(models.Model):
+class SalesAnalysis(models.Model):
+    xml_file = models.OneToOneField(
+        'Xml', verbose_name='Связанный xml-файл', related_name='analysis', on_delete=models.CASCADE
+    )
+    prompt = models.TextField('Текст запроса на анализ продаж', help_text='Промпт для LLM')
     text = models.TextField('Текст анализа продаж', help_text='Ответ LLM')
-    xml_file = models.OneToOneField('Xml', verbose_name='Xml-файл', related_name='analysis', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'Анализ продаж'
-        verbose_name_plural = 'Анализ продаж'
+        verbose_name = 'Результат анализ продаж'
+        verbose_name_plural = 'Результаты анализов продаж'
 
     def __str__(self) -> str:
         return f'Анализ продаж от {self.xml_file.date}'
