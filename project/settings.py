@@ -1,12 +1,15 @@
 from os import getenv, path
 from pathlib import Path
 
+from huey import RedisHuey
+from redis import ConnectionPool
+
 # Основные настройки Django
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-@622-2)6#x-)w#qp@5458=!e50hx4(+1y*xxgfp8)b4q%hl434'
+SECRET_KEY = getenv('SECRET_KEY', 'django-insecure-@622-2)6#x-)w#qp@5458=!e50hx4(+1y*xxgfp8)b4q%hl434')
 
-DEBUG = bool(getenv('DEBUG', 1))
+DEBUG = bool(int(getenv('DEBUG', 1)))
 
 ALLOWED_HOSTS = ALLOWED_HOSTS.split(' ') if (ALLOWED_HOSTS := getenv('ALLOWED_HOSTS')) else []
 
@@ -22,11 +25,13 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'huey.contrib.djhuey',
     'parser.apps.ParserConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -151,6 +156,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-# Настройка брокера для Celery
-CELERY_BROKER_URL = 'redis://redis:6379/1'
-CELERY_TIMEZONE = TIME_ZONE
+# Настройки huey
+REDIS_HOST = '127.0.0.1' if DEBUG else 'redis'
+POOL = ConnectionPool(host=REDIS_HOST, port=6379, max_connections=20)
+HUEY = RedisHuey('xml_parser', connection_pool=POOL)

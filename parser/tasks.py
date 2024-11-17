@@ -1,9 +1,12 @@
-from celery import shared_task
 from django.conf import settings
-from tools import analyze_products
+from huey import crontab
+
+from .tools import analyze_products
+
+huey = settings.HUEY
 
 
-@shared_task
+@huey.periodic_task(crontab(minute='*/1'))
 def analyze_products_task() -> None:
     if not settings.DEBUG:
         pass

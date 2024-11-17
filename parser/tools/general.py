@@ -1,16 +1,22 @@
 import asyncio
 import logging
 
-from xml_parsing import get_xml_data, process_xml_data
+from django.utils.timezone import now
 
 from parser import models
+
+from .xml_parsing import EmptyFile, InvalidResponse, get_xml_data, process_xml_data
 
 logger = logging.getLogger('xml_data_logger')
 
 
 async def get_and_process_data(source: models.Source) -> None:
     xml_data = await get_xml_data(source)
-    xml_file = await process_xml_data(source, xml_data)
+    try:
+        xml_file = await process_xml_data(source, xml_data)  # noqa
+    except (InvalidResponse, EmptyFile):
+        logger.warning(f'{now()}: ответ от {source.url} не является xml-файлом/ содержит xml-файл неверного формата')
+        return
     # await request_llm_analysis(xml_file)
 
 

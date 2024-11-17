@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import aiohttp
 from bs4 import BeautifulSoup, NavigableString
 from django.utils.timezone import now
+from retry import retry
 
 from parser import models
 
@@ -13,13 +14,19 @@ if TYPE_CHECKING:
 logger = logging.getLogger('xml_data_logger')
 
 
+class InvalidResponse(Exception):
+    pass
+
+
+class EmptyFile(Exception):
+    pass
+
+
+@retry(aiohttp.client_exceptions.ClientConnectorError, delay=5, backoff=2, max_delay=60)
 async def get_xml_data(source: models.Source) -> str:
     async with aiohttp.ClientSession() as session, session.get(source.url) as response:
-        logger.warning('Status:', response.status)
-        logger.warning('Content-type:', response.headers['content-type'])
-
         html = await response.text()
-        logger.warning(f'{now()}: получен xml-файл: {html}')
+        logger.warning(f'{now()}: От {source.url} получен xml-файл:\n{html}')
         return html
 
 
@@ -32,18 +39,23 @@ def get_nested_tag_content(tag: 'Tag', nested_tag: str, default: any = '') -> st
 
 async def process_xml_data(source: models.Source, xml_data: str) -> models.Xml:
     soup = BeautifulSoup(xml_data, 'xml')
-    main_tag = soup.find('sales_data')
-    xml_date = main_tag.get('date', now().date())
-    xml_file = await models.Xml.objects.acreate(source=source, date=xml_date)
+    if main_tag := soup.find('sales_data'):
+        xml_date = main_tag.get('date', now().date())
+        xml_file = await models.Xml.objects.acreate(source=source, date=xml_date)
 
-    products = [content for content in main_tag.find('products').contents if type(content) is not NavigableString]
-    for product in products:
-        product_data = {
-            'name': get_nested_tag_content(product, 'name'),
-            'quantity': get_nested_tag_content(product, 'quantity'),
-            'price': get_nested_tag_content(product, 'price'),
-            'category': get_nested_tag_content(product, 'category'),
-        }
-        await models.Product.objects.acreate(xml_file=xml_file, **product_data)
+        if products := main_tag.find('products'):
+            for product_ in [content for content in products.contents if type(content) is not NavigableString]:
+                product_data = {
+                    'name': get_nested_tag_content(product_, 'name'),
+                    'quantity': get_nested_tag_content(product_, 'quantity'),
+                    'price': get_nested_tag_content(product_, 'price'),
+                    'category': get_nested_tag_content(product_, 'category'),
+                }
+                await models.Product.objects.acreate(xml_file=xml_file, **product_data)
+            return xml_file
 
-    return xml_file
+        raise EmptyFile('Полученный xml-файл не содержит списка продуктов')
+
+    raise InvalidResponse(
+        'Полученный ответ не является xml-файлом, либо содержимое xml-файла имеет некорректную стуктуру'
+    )
