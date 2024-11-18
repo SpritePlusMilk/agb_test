@@ -1,0 +1,6 @@
+Проанализируй данные о продажах за {{ date }}:
+1. Общая выручка: {{ total_revenue }} рублей;
+2. Топ-3 товара по продажам: {% for product in top_products %} {{ forloop.counter }}) {{ product.name }} ({{ product.quantity }}) {% endfor %};
+3. Распределение по категориям: {% for category, quantity in categories.items %} {{ category }}: {{ quantity }}, {% endfor %}.
+
+Составь краткий аналитический отчет с выводами и рекомендациями.

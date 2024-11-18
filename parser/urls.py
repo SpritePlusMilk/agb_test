@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
-from parser import views
+from parser.views import views
 
 router = DefaultRouter()
 router.register('sources', views.SourceViewSet, 'sources')

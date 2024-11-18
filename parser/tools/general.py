@@ -1,13 +1,36 @@
 import asyncio
 import logging
+from time import sleep
 
 from django.utils.timezone import now
 
 from parser import models
 
+from .openai import request_llm_analysis
 from .xml_parsing import EmptyFile, InvalidResponse, get_xml_data, process_xml_data
 
 logger = logging.getLogger('xml_data_logger')
+
+
+def retry(tries=-1, delay=0, delay_step=0, max_delay=None):
+    def func_wrapper(f):
+        async def wrapper(*args, **kwargs):
+            _tries, _delay = tries, delay
+            while _tries:
+                try:
+                    return await f(*args, **kwargs)
+                except Exception:
+                    sleep(_delay)
+
+                _tries -= 1
+                _delay += delay_step
+
+                if max_delay is not None:
+                    _delay = min(_delay, max_delay)
+
+        return wrapper
+
+    return func_wrapper
 
 
 async def get_and_process_data(source: models.Source) -> None:
@@ -17,7 +40,7 @@ async def get_and_process_data(source: models.Source) -> None:
     except (InvalidResponse, EmptyFile):
         logger.warning(f'{now()}: ответ от {source.url} не является xml-файлом/ содержит xml-файл неверного формата')
         return
-    # await request_llm_analysis(xml_file)
+    await request_llm_analysis(xml_file)
 
 
 async def process_sources() -> None:

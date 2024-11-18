@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING
 import aiohttp
 from bs4 import BeautifulSoup, NavigableString
 from django.utils.timezone import now
-from retry import retry
 
 from parser import models
+from parser.tools import retry
+
+from .exceptions import EmptyFile, InvalidResponse
 
 if TYPE_CHECKING:
     from bs4 import Tag
@@ -14,15 +16,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger('xml_data_logger')
 
 
-class InvalidResponse(Exception):
-    pass
-
-
-class EmptyFile(Exception):
-    pass
-
-
-@retry(aiohttp.client_exceptions.ClientConnectorError, delay=5, backoff=2, max_delay=60)
+@retry(delay=5, delay_step=10, max_delay=60)
 async def get_xml_data(source: models.Source) -> str:
     async with aiohttp.ClientSession() as session, session.get(source.url) as response:
         html = await response.text()

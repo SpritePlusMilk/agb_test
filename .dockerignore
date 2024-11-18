@@ -4,6 +4,7 @@
 .ruff_cache/
 .pytest_cache/
 nginx/
+env/
 .coveragerc
 .coverage
 *.toml
