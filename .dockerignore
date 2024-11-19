@@ -9,3 +9,4 @@ env/
 .coverage
 *.toml
 *.sqlite3
+*.html

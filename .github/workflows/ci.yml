@@ -28,4 +28,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest --cov=api --cov-config=.coveragerc
+          pytest --cov=parser --cov-config=.coveragerc

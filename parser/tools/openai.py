@@ -50,12 +50,11 @@ def get_llm_prompt(xml_file: Xml) -> str:
     products = xml_file.products.all()
     aggregation_options = {category[1]: Count('pk', filter=Q(category=category[0])) for category in CATEGORY_CHOICES}
     context = {
-        'date': xml_file.date,
+        'date': xml_file.date.strftime('%d.%m.%Y'),
         'top_products': products.order_by('quantity')[:3].values('name', 'quantity'),
         'categories': products.aggregate(**aggregation_options),
-        'total_revenue': products.annotate(revenue=F('quantity') * F('price')).aggregate(Sum('revenue'))[
-            'revenue__sum'
-        ],
+        'total_revenue': products.annotate(revenue=F('quantity') * F('price')).aggregate(Sum('revenue'))['revenue__sum']
+        or 0,
     }
     prompt = render_to_string('parser/prompt_template.txt', context)
     logger.warning(f'{now()}: Сформирован запрос на анализ продаж от {xml_file.date}:\n {prompt}')

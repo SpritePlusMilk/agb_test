@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 from django.http import HttpResponse
 from rest_framework.viewsets import ModelViewSet
 
-from parser.filters import SourceFilter
 from parser.models import Source
-from parser.serializers import SourceSerializer
+from parser.views.filters import SourceFilter
+from parser.views.serializers import SourceSerializer
 
 if TYPE_CHECKING:
     from rest_framework.request import Request

@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from parser.consts import CATEGORY_CHOICES
@@ -35,16 +34,16 @@ class Product(models.Model):
     xml_file = models.ForeignKey('Xml', verbose_name='Xml-файл', related_name='products', on_delete=models.CASCADE)
 
     name = models.CharField('Наименование', max_length=255)
-    quantity = models.IntegerField(
-        'Количество',
-        validators=((MinValueValidator(0, 'Количество товаров не может быть отрицательным')),),
-    )
+    quantity = models.IntegerField('Количество', default=0)
     price = models.DecimalField('Стоимость', max_digits=8, decimal_places=2)
     category = models.CharField('Категория', max_length=255, choices=CATEGORY_CHOICES)
 
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
+        constraints = [
+            models.CheckConstraint(condition=models.Q(quantity__gte=0), name='quantity_is_positive'),
+        ]
 
     def __str__(self) -> str:
         return f'Продукт "{self.name} ({self.category}), {self.quantity} шт., {self.price} руб.'
