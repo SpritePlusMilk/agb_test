@@ -5,7 +5,6 @@ coverage.html
 
 
 # Django stuff:
-logs/
 *.log
 *.sqlite3
 

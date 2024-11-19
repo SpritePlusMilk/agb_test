@@ -1,10 +1,6 @@
 from os import getenv, path
 from pathlib import Path
 
-from huey import RedisHuey
-from redis import ConnectionPool
-
-# Основные настройки Django
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = getenv('SECRET_KEY', 'django-insecure-@622-2)6#x-)w#qp@5458=!e50hx4(+1y*xxgfp8)b4q%hl434')
@@ -60,28 +56,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
-# Database
-
-if getenv('DB_ENGINE'):
-    DATABASES = {
-        'default': {
-            'ENGINE': getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-            'NAME': getenv('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
-            'USER': getenv('POSTGRES_USER', 'testuser'),
-            'PASSWORD': getenv('POSTGRES_PASSWORD', 'password'),
-            'HOST': getenv('POSTGRES_HOST', 'localhost'),
-            'PORT': int(getenv('POSTGRES_PORT', '5432')),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        },
-    }
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -115,17 +89,19 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '{asctime}: {message}',
+        'simple': {
+            'format': '{levelname} {message}',
             'style': '{',
         },
     },
     'handlers': {
         'xml_data_handler': {
+            'level': 'WARNING',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': path.join(BASE_DIR, 'logs/xml_files.log'),
+            'filename': 'logs/xml_files.log',
             'backupCount': 7,
             'when': 'midnight',
+            'formatter': 'simple',
         },
     },
     'loggers': {
@@ -136,30 +112,7 @@ LOGGING = {
     },
 }
 
-# Настройки DRF
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-}
 
-# Настройки drf-spectacular
-SPECTACULAR_SETTINGS = {
-    'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
-    'TITLE': 'Тестовое задание',
-    'DESCRIPTION': 'Swagger',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-}
-
-# Настройки huey
-REDIS_HOST = '127.0.0.1' if DEBUG else 'redis'
-POOL = ConnectionPool(host=REDIS_HOST, port=6379, max_connections=20)
-HUEY = RedisHuey('xml_parser', connection_pool=POOL)
+from project.settings.database import *  # noqa
+from project.settings.other import *  # noqa
+from project.settings.rest_framework import *  # noqa
