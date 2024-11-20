@@ -1,7 +1,9 @@
 import asyncio
 import logging
 
+from django.conf import settings
 from django.utils.timezone import now
+from huey import crontab
 
 from parser import models
 
@@ -9,6 +11,7 @@ from .openai import request_llm_analysis
 from .xml_parsing import EmptyFile, InvalidResponse, get_xml_data, process_xml_data
 
 logger = logging.getLogger('xml_data_logger')
+huey = settings.HUEY
 
 
 async def get_and_process_data(source: models.Source) -> None:
@@ -27,5 +30,9 @@ async def process_sources() -> None:
             tg.create_task(coro=get_and_process_data(source))
 
 
+@huey.periodic_task(crontab(hour=12, minute=0))
 def analyze_products() -> None:
-    asyncio.run(process_sources())
+    if settings.DEBUG:
+        pass
+    else:
+        asyncio.run(process_sources())

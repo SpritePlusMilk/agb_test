@@ -27,6 +27,8 @@
 
 
 ## Запуск проекта
+в .project-env значение переменной DEBUG поменять на 1  
+
 В директории репозитория ввести в консоли:
 - `docker-compose build`
 - `docker-compose up -d`
