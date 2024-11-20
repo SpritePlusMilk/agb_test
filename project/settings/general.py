@@ -84,33 +84,33 @@ STATIC_ROOT = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
         },
-    },
-    'handlers': {
-        'xml_data_handler': {
-            'level': 'WARNING',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/xml_files.log',
-            'backupCount': 7,
-            'when': 'midnight',
-            'formatter': 'simple',
+        'handlers': {
+            'xml_data_handler': {
+                'level': 'WARNING',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                'filename': 'logs/xml_files.log',
+                'backupCount': 7,
+                'when': 'midnight',
+                'formatter': 'simple',
+            },
         },
-    },
-    'loggers': {
-        'xml_data_logger': {
-            'level': 'WARNING',
-            'handlers': ['xml_data_handler'],
+        'loggers': {
+            'xml_data_logger': {
+                'level': 'WARNING',
+                'handlers': ['xml_data_handler'],
+            },
         },
-    },
-}
+    }
 
 
 from project.settings.database import *  # noqa
